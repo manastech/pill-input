@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>mBuilder</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script type="text/javascript" src="textInput.js"></script>
+</head>
+<meta charset="utf-8">
+<body>
+</body>
+<script>
+
+  function createExample(title, className, content) {
+    var example = document.createElement("div");
+    var header = example.appendChild(document.createElement("h1"));
+    header.textContent = title;
+    var textInput = example.appendChild(document.createElement("div"));
+    textInput.className = className;
+    textInput.contentEditable = "true";
+    textInput.setAttribute("ondrop", "dropHandler(event)");
+    textInput.setAttribute("ondragover", "dragOverHandler(event)");
+    textInput.setAttribute("onkeydown", "keyDownHandler(event)");
+    textInput.innerHTML = content;
+    textInput.addEventListener("copy", copyHandler);
+    textInput.addEventListener("cut", cutHandler);
+    textInput.addEventListener("paste", pasteHandler);
+    var dropZone = example.appendChild(document.createElement("div"));
+    dropZone.className = "dropZone";
+    dropZone.setAttribute("ondrop", "dropHandler(event)");
+    dropZone.setAttribute("ondragover", "dragOverHandler(event)");
+    dropZone.setAttribute("ondragenter", "dragEnterHandler(event)");
+    dropZone.setAttribute("ondragleave", "dragLeaveHandler(event)");
+    return example;
+  }
+
+  function createPill(label) {
+    var pill = document.createElement("a");
+    pill.id = guid();
+    pill.draggable = true;
+    pill.className = "pill";
+    pill.contentEditable = "false";
+    pill.setAttribute("data-label", label);
+    pill.setAttribute("ondragstart", "dragStartHandler(event)");
+    pill.setAttribute("ondragend", "dragEndHandler(event)");
+    pill.setAttribute("ondrop", "return false;");
+    pill.setAttribute("oncontextmenu", "contextMenuHandler(event)");
+    pill.setAttribute("onclick", "contextMenuHandler(event)");
+    var labelNode = pill.appendChild(document.createElement("span"));
+    labelNode.setAttribute("ondrop", "return false;");
+    labelNode.textContent = label;
+    var arrowNode = pill.appendChild(document.createElement("span"));
+    arrowNode.setAttribute("ondrop", "return false;");
+    arrowNode.className = "arrow";
+    return pill;
+  }
+
+  window.onload = function() {
+    var body = document.body;
+    body.appendChild(createExample("Input (resizable)", "input resize", "Lorem ipsum " + createPill("dolor sit").outerHTML + " amet"));
+    body.appendChild(createExample("Input (autoexpand)", "input autoexpand", "Lorem ipsum " + createPill("dolor sit").outerHTML + " amet"));
+    body.appendChild(createExample("Input (khmer)", "input", "ជាណាចក្រកម្ពុជា " + createPill("ព្រះរា").outerHTML + " កម្ពុជា"));
+    body.appendChild(createExample("Input (chinese)", "input", "滆, 駇僾 踆 耜僇鄗 鏀顝饇 芘芛芤 岪弨 蔏 儮嬼懫 " + createPill("厊圪妀").outerHTML + " 鴸鼢曘"));
+    body.appendChild(createExample("Input (hebrew)", "input rtl", "את אל בקרבת יוצרים בהיסטוריה " + createPill("היסטוריה").outerHTML + " ב צ'ט בחירות מיתולוגיה"));
+
+  }
+  
+</script>
+<style>
+
+</style>
+</html>
