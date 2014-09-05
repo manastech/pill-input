@@ -12,14 +12,21 @@
 
   function createExample(title, className, content) {
     var example = document.createElement("div");
+    example.className = "example";
     var header = example.appendChild(document.createElement("h1"));
     header.textContent = title;
     var textInput = example.appendChild(document.createElement("div"));
     textInput.className = className;
     textInput.contentEditable = "true";
+    window.addEventListener("change", function(e) {
+      console.log(e)
+    });
     textInput.setAttribute("ondrop", "dropHandler(event)");
     textInput.setAttribute("ondragover", "dragOverHandler(event)");
     textInput.setAttribute("onkeydown", "keyDownHandler(event)");
+    textInput.setAttribute("onkeyup", "keyUpHandler(event)");
+    textInput.setAttribute("onmouseup", "mouseUpHandler(event)");
+    textInput.setAttribute("onblur", "blurHandler(event)");
     textInput.innerHTML = content;
     textInput.addEventListener("copy", copyHandler);
     textInput.addEventListener("cut", cutHandler);
@@ -30,6 +37,11 @@
     dropZone.setAttribute("ondragover", "dragOverHandler(event)");
     dropZone.setAttribute("ondragenter", "dragEnterHandler(event)");
     dropZone.setAttribute("ondragleave", "dragLeaveHandler(event)");
+    var button =  example.appendChild(document.createElement("button"));
+    button.id = "pillButton";
+    button.textContent = "Create pill";
+    button.style.display = "none";
+    button.setAttribute("onclick", "pillButtonClickHandler(event)");
     return example;
   }
 
@@ -61,11 +73,7 @@
     body.appendChild(createExample("Input (khmer)", "input", "ជាណាចក្រកម្ពុជា " + createPill("ព្រះរា").outerHTML + " កម្ពុជា"));
     body.appendChild(createExample("Input (chinese)", "input", "滆, 駇僾 踆 耜僇鄗 鏀顝饇 芘芛芤 岪弨 蔏 儮嬼懫 " + createPill("厊圪妀").outerHTML + " 鴸鼢曘"));
     body.appendChild(createExample("Input (hebrew)", "input rtl", "את אל בקרבת יוצרים בהיסטוריה " + createPill("היסטוריה").outerHTML + " ב צ'ט בחירות מיתולוגיה"));
-
   }
   
 </script>
-<style>
-
-</style>
 </html>
