@@ -1,7 +1,12 @@
+body {
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px;
+  line-height: 1.75em;
+}
+
 h1 {
   margin-top: 30px;
   display: block;
-  font-family: Arial;
   font-weight: normal;
   font-size: 16px;
   color: #999999;
@@ -10,7 +15,7 @@ h1 {
 .input {
   display: inline-block;
   vertical-align: top;
-  border: 1px #cccccc solid;
+  border: 1px #CCCCCC solid;
   border-radius: 3px;
   width: 150px;
   height: 150px;
@@ -39,19 +44,27 @@ h1 {
 }
 
 .input:empty {
-  background: #eeeeee !important;
+  background: #EEEEEE !important;
 }
 
 .pill {
   cursor: move;
-  border-radius: 3px;
-  background: #ffcc00;
+  border-radius: 10px;
+  background: white;
+  border: 1px solid #CCCCCC;
   padding: 0px 5px 0px 5px; 
-  display: inline;    
+  display: inline-block;    
   white-space: nowrap;
-  box-shadow: 0px 1px 0px 0px rgba(0,0,0,0.5);
-  -moz-box-shadow: 0px 1px 0px 0px rgba(0,0,0,0.5);
-  -webkit-box-shadow: 0px 1px 0px 0px rgba(0,0,0,0.5);
+  line-height: 1.4em;
+}
+
+.pill:active {
+  background: #E7E7E7;
+}
+
+.pill.focus {
+  color:#1E86C8;
+  border: 1px solid #1E86C8;
 }
 
 .pill .option {
@@ -77,18 +90,26 @@ h1 {
 }
 
 .pill .arrow {
-  margin: 0px 0px 0px 5px;
+  margin: 0px 0px 1px 5px;
   cursor: pointer;
   display: inline-block;
   width: 0;
   height: 0;
   border-style: solid;
-  border-width: 8.7px 5px 0 5px;
+  border-width: 7px 4px 0 4px;
   border-color: #000000 transparent transparent transparent;
+}
+
+.pill.focus .arrow {
+  border-color: #1E86C8 transparent transparent transparent;
 }
 
 .input.rtl .pill .arrow {
   margin: 0px 5px 0px 0px;
+}
+
+.input.rtl + .dropZone .pill {
+  float: right;
 }
 
 .dropZone {
@@ -97,8 +118,8 @@ h1 {
   vertical-align: top;
   margin-left: 20px;
   margin-right: 20px;
-  background: #eeeeee;
-  border: 1px #cccccc solid;
+  background: #EEEEEE;
+  border: 1px #CCCCCC solid;
   border-radius: 3px;
   width: 150px;
   height: 150px;
@@ -115,10 +136,32 @@ h1 {
   direction: rtl;
 }
 
-.input.rtl + .dropZone .pill {
-  float: right;
-}
 
 .dropZone.dragover {
   border: 1px dashed #999999;
+}
+
+.menu {
+  padding: 5px;
+  position: absolute;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.5);
+  -moz-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.5);
+  -webkit-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.5);
+}
+
+.menu button {
+  font-family: "Open Sans", sans-serif;
+  color: white;
+  background: #4C9ED3;
+  border-radius: 10px;
+  border: 0;
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+}
+
+.menu button:first-child {
+    margin-top: 0px;
 }
