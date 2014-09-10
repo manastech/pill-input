@@ -17,7 +17,6 @@ var DATA_OPTION = "data-option";
 var DATA_LABEL = "data-label";
 var MOVE = "move";
 var TEXT = "text";
-var TEXT_HTML = "text/outerHTML";
 
 var DRAG_START = "dragstart";
 var DRAG_END = "dragend";
@@ -37,9 +36,9 @@ var BLUR = "blur";
 var COPY = "copy";
 var CUT = "cut";
 
-var source, menu, selectedRange;
+var source, relatedElement, menu;
 
-function createPill(label) {
+function Pill(label) {
   var pill = document.createElement(A);
   pill.id = guid();
   pill.draggable = true;
@@ -50,29 +49,29 @@ function createPill(label) {
   labelNode.textContent = label;
   var arrowNode = pill.appendChild(document.createElement(SPAN));
   arrowNode.className = ARROW;
-  return pill;
+  this.source = pill;
 }
 
-function createMenu(owner) {
+function Menu(owner) {
   var menu = document.body.appendChild(document.createElement(DIV));
   menu.className = MENU;
-  menu.appendChild(createOption("min", "min", undefined, owner));
-  menu.appendChild(createOption("max", "max", undefined, owner));
-  menu.appendChild(createOption("sum", "sum", undefined, owner));
-  menu.appendChild(createOption("avg", "average", undefined, owner));
-  menu.appendChild(createOption("none", undefined, "background:#CCCCCC;", owner));
-  menu.appendChild(createOption("break", undefined, "background:#ff6600;", owner, function(e) {
+  menu.appendChild(new MenuOption("min", "min", undefined, owner).source);
+  menu.appendChild(new MenuOption("max", "max", undefined, owner).source);
+  menu.appendChild(new MenuOption("sum", "sum", undefined, owner).source);
+  menu.appendChild(new MenuOption("avg", "average", undefined, owner).source);
+  menu.appendChild(new MenuOption("none", undefined, "background:#CCCCCC;", owner).source);
+  menu.appendChild(new MenuOption("break", undefined, "background:#ff6600;", owner, function(e) {
     var pill = getAncestor(PILL, owner);
     var container = pill.parentNode;
     var textNode = document.createTextNode(pill.getAttribute(DATA_LABEL));
     container.replaceChild(textNode, pill);
-    closeMenu();
+    hideMenu();
     e.stopPropagation();
-  }));
-  return menu
+  }).source);
+  this.source = menu;
 }
 
-function createOption(label, option, style, target, customHandler) {
+function MenuOption(label, option, style, target, customHandler) {
   var button = document.createElement(BUTTON);
   if(style) {
     button.setAttribute("style", style);
@@ -91,13 +90,24 @@ function createOption(label, option, style, target, customHandler) {
     } else {
       target.removeAttribute(DATA_OPTION);
     }
-    closeMenu();
+    hideMenu();
     e.stopPropagation();
   }
-  return button;
+  this.source = button;
 }
 
-function closeMenu() {
+function showMenu(pill) {
+  menu = new Menu(pill).source;
+  var left = window.pageXOffset || document.body.scrollLeft || document.documentElement.scrollLeft || 0;
+  var top = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop || 0;
+  var boundingBox = pill.getBoundingClientRect();
+  var x = boundingBox.left + boundingBox.width - menu.clientWidth + left;
+  var y = boundingBox.top + boundingBox.height + 5 + top;
+  menu.style.left = x + "px";
+  menu.style.top = y + "px";
+}
+
+function hideMenu() {
   if (menu && menu.parentNode) {
     menu.parentNode.removeChild(menu);
     menu = undefined;
@@ -105,15 +115,12 @@ function closeMenu() {
 }
 
 function displayPillButton(dispatcher) {
+  if(!getAncestor(INPUT, dispatcher)) return;
   var range = window.getSelection().rangeCount? window.getSelection().getRangeAt(0) : undefined;
-  var selection = false;
-  if (range && !range.collapsed && getAncestor("input", range.startContainer) && getAncestor("input", range.endContainer)) {
-    selection = range.startContainer == range.endContainer && range.startOffset == range.endOffset? false : true;
-  }
   var container = getAncestor(EXAMPLE, dispatcher);
   if (container) {
-    var pillButton = container.querySelector("#" + PILL_BUTTON);
-    pillButton.style.display = selection? "block" : "none";
+    var pillButton = container.querySelector("." + PILL_BUTTON);
+    pillButton.style.display = range && !range.collapsed? "block" : "none";
     var input = container.querySelector("." + INPUT);
     for (var element = input.firstChild; element != null; element = element.nextSibling) {
       if (element.classList && element.classList.contains(PILL)) {
@@ -121,9 +128,8 @@ function displayPillButton(dispatcher) {
       }
     }
   }
-  selectedRange = selection? range : undefined;
-  if (selectedRange) {
-    for (var element = selectedRange.startContainer; element && element != selectedRange.endContainer.nextSibling; element = element.nextSibling) {
+  if (range && !range.collapsed) {
+    for (var element = range.startContainer; element && element != range.endContainer.nextSibling; element = element.nextSibling) {
       if (element && element.classList && element.classList.contains(PILL)) {
         element.classList.add(FOCUS);
       }
@@ -146,23 +152,11 @@ function insertAtPosition(elements, x, y) {
     offset = range.startOffset;
   }
   if (node.nodeType == Node.TEXT_NODE) {
+    node = node.splitText(range.startOffset);
     var container = node.parentNode;
-    if (container.classList.contains(INPUT)) {
-      node = node.splitText(offset);
-      elements.forEach(function (element) {
-        if (element.nodeType) {
-          container.insertBefore(element, node);
-        }
-      });
-    } else {
-      node = getAncestor(PILL, node);
-      container = node.parentNode;
-      if (container) {
-        elements.forEach(function (element) {
-          container.insertBefore(element, node);
-        });
-      }
-    }
+    elements.forEach(function (element) {
+      container.insertBefore(element, node);
+    });
   } else {
      elements.forEach(function (element) {
       node.appendChild(element);
@@ -170,10 +164,171 @@ function insertAtPosition(elements, x, y) {
   }
 }
 
+function insert(elements) {
+  if (!(elements instanceof Array)) {
+    elements = [elements];
+  }
+  var range = window.getSelection().rangeCount? window.getSelection().getRangeAt(0) : undefined;
+  if(range && !range.collapsed) {
+    trim(range);
+    deleteSelection();
+    var range = window.getSelection().rangeCount? window.getSelection().getRangeAt(0) : undefined;
+  }
+  var node = range.startContainer;
+  if (node.nodeType == Node.TEXT_NODE) {
+    node = node.splitText(range.startOffset);
+    var container = node.parentNode;
+    elements.forEach(function (element) {
+      container.insertBefore(element, node);
+    });
+  } else {
+    if(node.classList.contains(INPUT)) {
+       elements.forEach(function (element) {
+        node.appendChild(element);
+      });
+    } else {
+      elements.forEach(function (element) {
+        container.insertBefore(element, node);
+      });
+    }
+  }
+}
+
+function createPill() {
+  var range = window.getSelection().rangeCount? window.getSelection().getRangeAt(0) : undefined;
+  if (range && !range.collapsed && getAncestor(INPUT, range.startContainer) && getAncestor(INPUT, range.endContainer)) {
+    var elements = trim(range);
+    var insertTarget = range.endContainer.nextSibling;
+    var input = getAncestor(INPUT, range.endContainer);
+    var label = "";
+    elements.forEach(function (element) {
+      switch(element.nodeType) {
+        case Node.ELEMENT_NODE:
+          if (element.classList.contains(PILL)) {
+            label += element.getAttribute(DATA_LABEL);
+            input.removeChild(element);
+          } else {
+            label += element.textContent;
+            if (element == input) {
+              while(input.hasChildNodes()) {
+                input.removeChild(input.lastChild);
+              }
+            }
+          }
+          break;
+        case Node.TEXT_NODE:
+          label += element.data;        
+          input.removeChild(element);
+          break;
+      }
+    });
+    var pill = new Pill(label).source;
+    if (insertTarget && input.contains(insertTarget)) {
+      input.insertBefore(pill, insertTarget);
+    } else {
+      input.appendChild(pill);
+    }
+  }
+}
+
 function sanitize(element) {
   element.normalize();
   if (element.hasChildNodes() && element.firstChild.nodeName == BR) {
     element.removeChild(element.firstChild);
+  }
+}
+
+function trim(range) {
+  if (!range) return;
+  var startContainer = range.startContainer;
+  if (range.startOffset) {
+    startContainer = startContainer.splitText(range.startOffset);
+    range.setStart(startContainer, 0);
+  }
+  var endContainer = range.endContainer;
+  if (endContainer.nodeType == Node.TEXT_NODE && range.endOffset < endContainer.data.length) {
+    endContainer.splitText(range.endOffset);
+    range.setEnd(endContainer, endContainer.data.length);
+  }
+  clearSelection();
+  window.getSelection().addRange(range);
+  var elements = [];
+  for (var element = startContainer; element && element != endContainer.nextSibling; element = element.nextSibling) {
+    elements.push(element);
+  }
+  return elements;
+}
+
+function copy(range) {
+  var elements = [];
+  if (range && getAncestor(INPUT, range.startContainer) && getAncestor(INPUT, range.endContainer)) {
+    if(range.startContainer == range.endContainer) {
+      switch(range.startContainer.nodeType) {
+        case Node.TEXT_NODE:
+          var substring = range.startContainer.data.substring(range.startOffset, range.endOffset);
+          elements.push(document.createTextNode(substring));
+          break;
+        case Node.ELEMENT_NODE:
+          for (var index = range.startOffset; index < range.endOffset; index++) {
+            var node = element.childNodes[index];
+            elements.push(node.cloneNode(true));
+          }
+          break;
+      }
+    } else {
+      for (var node = range.startContainer; node && node != range.endContainer.nextSibling; node = node.nextSibling) {
+        switch(node.nodeType) {
+          case Node.TEXT_NODE:
+            var substring;
+            if(node == range.startContainer) {
+              substring = node.data.substring(range.startOffset, node.data.length);
+            } else if (node == range.endContainer) {
+              substring = node.data.substring(0, range.endOffset);
+            } else {
+              substring = node.data;
+            }
+            elements.push(document.createTextNode(substring));
+            break;
+          case Node.ELEMENT_NODE:
+            elements.push(node.cloneNode(true));
+            break;
+        }
+      }
+    }
+    return elements;
+  }
+  if (range.startOffset) {
+    startContainer = startContainer.splitText(range.startOffset);
+    range.setStart(startContainer, 0);
+  }
+  var endContainer = range.endContainer;
+  if (endContainer.nodeType == Node.TEXT_NODE && range.endOffset < endContainer.data.length) {
+    endContainer.splitText(range.endOffset);
+    range.setEnd(endContainer, endContainer.data.length);
+  }
+  clearSelection();
+  window.getSelection().addRange(range);
+  var elements = [];
+  for (var element = startContainer; element && element != endContainer.nextSibling; element = element.nextSibling) {
+    elements.push(element);
+  }
+  return elements;
+}
+
+function deleteSelection() {
+  if (window.getSelection) {
+    var selection = window.getSelection();
+    selection.deleteFromDocument ();
+    if (!selection.isCollapsed) {
+      selection.getRangeAt(0).deleteContents();
+    }
+    if (selection.anchorNode) {
+      selection.collapse (selection.anchorNode, selection.anchorOffset);
+    }
+  } else {
+    if (document.selection) {
+      document.selection.clear();
+    }
   }
 }
 
@@ -204,15 +359,40 @@ function S4() {
   return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
 }
 
+function toArray(obj) {
+  return [].map.call(obj, function(element) {
+    return element;
+  });
+};
+
 //Handlers
 
 function dragStartHandler(e) {
+  var data = "";
+  var range = window.getSelection().rangeCount? window.getSelection().getRangeAt(0) : undefined;
   var pill = getAncestor(PILL, e.target);
-  if(pill) {
+  if (range && getAncestor(INPUT, range.startContainer) && getAncestor(INPUT, range.endContainer)) {
+    var elements = copy(range);
+    elements.forEach(function (element) {
+      switch(element.nodeType) {
+        case Node.TEXT_NODE:
+          data += element.data;
+          break;
+        case Node.ELEMENT_NODE:
+          data += element.outerHTML;
+          break;
+      }
+    });
+    relatedElement = elements;
+    source = getAncestor(INPUT, range.startContainer);
+  } else if(pill) {
+    data = pill.outerHTML;
+    relatedElement = pill;
     source = pill.parentNode;
-    e.dataTransfer.effectAllowed  = MOVE;
-    e.dataTransfer.setData(TEXT_HTML, pill.outerHTML);
-    e.dataTransfer.setData(TEXT, pill.id);
+  }
+  if(data.length) {
+    e.dataTransfer.effectAllowed = MOVE;
+    e.dataTransfer.setData(TEXT, data);
   }
 }
 
@@ -222,7 +402,7 @@ function dragEndHandler(e) {
 
 function dragEnterHandler(e) {
   var target = e.target;
-  if(target.classList.contains(DROP_ZONE)) {
+  if(target.classList && target.classList.contains(DROP_ZONE)) {
     target.classList.add(DRAG_OVER);
     e.preventDefault();
   }
@@ -230,7 +410,7 @@ function dragEnterHandler(e) {
 
 function dragLeaveHandler(e) {
   var target = e.target;
-  if(target.classList.contains(DROP_ZONE)) {
+  if(target.classList && target.classList.contains(DROP_ZONE)) {
     target.classList.remove(DRAG_OVER);
     e.preventDefault();
   }
@@ -245,30 +425,39 @@ function dragOverHandler(e) {
 
 function dropHandler(e) {
   var target = e.target;
-  var data = document.getElementById(e.dataTransfer.getData(TEXT)) || e.dataTransfer.getData(TEXT_HTML);
+  var wrapper = document.createElement(DIV);
+  wrapper.innerHTML = e.dataTransfer.getData(TEXT);
   target.classList.remove(DRAG_OVER);
-  if (!data.nodeType) return;
   if (target.classList.contains(DROP_ZONE)) {
-    if (target != source && data.nodeType == Node.ELEMENT_NODE) {
-      var clone = data.cloneNode(true);
-      clone.id = guid();
-      target.appendChild(clone);
+    if (target != source) {
+      var pills = toArray(wrapper.querySelectorAll("." + PILL));
+      pills.forEach(function (pill) {
+        target.appendChild(pill);
+      });
     }
     e.preventDefault();
   } else if (target.classList.contains(INPUT)) {
+    var elements = toArray(wrapper.childNodes);
     if (target != source) {
-      data = data.cloneNode(true);
-      if (data.id) {
-        data.id = guid();
-      }
+      elements.forEach(function (element) {
+        if (element.id) {
+          element.id = guid();
+        }  
+      });
     } else {
-      e.preventDefault();
+      if(relatedElement.classList && relatedElement.classList.contains(PILL)) {
+        relatedElement.parentNode.removeChild(relatedElement);
+      }else {
+        deleteSelection();
+      };
     }
-    insertAtPosition(data, e.clientX, e.clientY);
+    insertAtPosition(elements, e.clientX, e.clientY);
+    e.preventDefault();
   }
   sanitize(target);
   clearSelection();
   e.stopPropagation();
+  relatedElement = undefined;
   source = undefined;
 }
 
@@ -277,8 +466,8 @@ function keyDownHandler(e) {
   if(!input) return;
   switch(e.keyCode) {
     case 8:
-      var range = window.getSelection().getRangeAt(0);
-      if(range.collapsed) {
+      var range = window.getSelection().rangeCount? window.getSelection().getRangeAt(0) : undefined;
+      if(range && range.collapsed) {
         var target;
         switch(range.startContainer.nodeType) {
           case Node.ELEMENT_NODE:
@@ -318,72 +507,27 @@ function keyUpHandler(e) {
 }
 
 function clickHandler(e) {
-  if(e.target.id == PILL_BUTTON) {
-    if (selectedRange) {
-      var startContainer = selectedRange.startContainer;
-      if (selectedRange.startOffset) {
-        startContainer = startContainer.splitText(selectedRange.startOffset);
-      }
-      var endContainer = selectedRange.endContainer;
-      if (endContainer.nodeType == Node.TEXT_NODE && selectedRange.endOffset < endContainer.data.length) {
-        endContainer.splitText(selectedRange.endOffset);
-      }
-      var insertTarget = endContainer.nextSibling;
-      var input = getAncestor(INPUT, startContainer);
-      var label = "";
-      var elements = [];
-      for (var element = startContainer; element && element != endContainer.nextSibling; element = element.nextSibling) {
-        switch(element.nodeType) {
-          case Node.ELEMENT_NODE:
-            if (element.classList.contains(PILL)) {
-              label += element.getAttribute(DATA_LABEL);
-            } else {
-              label += element.textContent;
-            }
-            break;
-          case Node.TEXT_NODE:
-            label += element.data;        
-            break;
-        }
-        elements.push(element);
-      }
-      elements.forEach(function (element) {
-         if (element == input) {
-          while(input.hasChildNodes()) {
-            input.removeChild(input.lastChild);
-          }
-        } else {
-          input.removeChild(element);
-        }
-      });
-      var pill = createPill(label);
-      if (insertTarget && input.contains(insertTarget)) {
-        input.insertBefore(pill, insertTarget);
-      } else {
-        input.appendChild(pill);
-      }
-    }
+  if(e.target.classList.contains(PILL_BUTTON)) {
+    createPill();
+    clearSelection();
+    displayPillButton(getAncestor(INPUT, e.target.parentNode.querySelector("." + INPUT)));
   } else {
     var pill = getAncestor(PILL, e.target);
+    var input = getAncestor(INPUT, e.target);
     var arrow = e.target.className == ARROW;
     var rightButton = e.which == 3;
+    window.setTimeout(displayPillButton, 50, input);
     if(!pill || (!arrow && !rightButton)) return;
     if (e.type == CONTEXT_MENU) e.preventDefault();
-    closeMenu();
-    menu = createMenu(pill);
-    var left = window.pageXOffset || document.body.scrollLeft || document.documentElement.scrollLeft || 0;
-    var top = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop || 0;
-    var boundingBox = pill.getBoundingClientRect();
-    var x = boundingBox.left + boundingBox.width - menu.clientWidth + left;
-    var y = boundingBox.top + boundingBox.height + 5 + top;
-    menu.style.left = x + "px";
-    menu.style.top = y + "px";
+    hideMenu();
+    showMenu(pill);
   }
+
 }
 
 function mouseDownHandler(e) {
   if (menu && !menu.contains(e.target)) {
-    closeMenu();
+    hideMenu();
   }
   document.addEventListener(MOUSE_MOVE, mouseMoveHandler);
   document.addEventListener(MOUSE_UP, mouseUpHandler);
@@ -406,22 +550,49 @@ function blurHandler(e) {
 }
 
 function copyHandler(e) {
-  var input = getAncestor("input", e.target);
-  if(!input) return;
-  e.clipboardData.setData("text/html", "");
-  e.preventDefault()
+  var input = getAncestor(INPUT, e.target);
+  var range = window.getSelection().rangeCount? window.getSelection().getRangeAt(0) : undefined;
+  if(input && range && !range.collapsed && getAncestor(INPUT, range.startContainer) && getAncestor(INPUT, range.endContainer)) {
+    var elements = copy(range);
+    var data = "";
+    elements.forEach(function (element) {
+      switch(element.nodeType) {
+        case Node.TEXT_NODE:
+          data += element.data;
+          break;
+        case Node.ELEMENT_NODE:
+          data += element.outerHTML;
+          break;
+      }
+    });
+    e.clipboardData.setData(TEXT, data);
+    e.preventDefault()
+  }
 }
 
 function cutHandler(e) {
-  var input = getAncestor("input", e.target);
-  if(!input) return;
-  e.clipboardData.setData("text/html", "");
-  e.preventDefault()
+  copyHandler(e);
+  var input = getAncestor(INPUT, e.target);
+  var range = window.getSelection().rangeCount? window.getSelection().getRangeAt(0) : undefined;
+  if(input && range) {
+    deleteSelection();
+  }
 }
 
 function pasteHandler(e) {
-  var input = getAncestor("input", e.target);
-  if(!input) return;
-  e.clipboardData.getData("text/html");
-  e.preventDefault()
+  var input = getAncestor(INPUT, e.target);
+  if(input) {
+    var elements = [];
+    var wrapper = document.createElement(DIV);
+    wrapper.innerHTML = e.clipboardData.getData(TEXT);
+    while(wrapper.hasChildNodes()) {
+      elements.push(wrapper.removeChild(wrapper.firstChild));
+    }
+    insert(elements);
+    var range = document.createRange();
+    range.setStartAfter(elements[elements.length - 1]);
+    clearSelection();
+    window.getSelection().addRange(range);
+    e.preventDefault()
+  }
 }

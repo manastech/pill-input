@@ -11,7 +11,7 @@
 </body>
 <script>
 
-  function createExample(title, className, content) {
+  function Example(title, className, content) {
     var example = document.createElement("div");
     example.className = "example";
     var header = example.appendChild(document.createElement("h1"));
@@ -23,21 +23,19 @@
     var dropZone = example.appendChild(document.createElement("div"));
     dropZone.className = "dropZone";
     var button =  example.appendChild(document.createElement("button"));
-    button.id = "pillButton";
+    button.className = "pillButton";
     button.textContent = "Create pill";
     button.style.display = "none";
-    return example;
+    this.source = example;
   }
-
-  
 
   window.onload = function() {
     var body = document.body;
-    body.appendChild(createExample("Input (resizable)", "input resize", "Lorem ipsum " + createPill("dolor sit").outerHTML + " amet"));
-    body.appendChild(createExample("Input (autoexpand)", "input autoexpand", "Lorem ipsum " + createPill("dolor sit").outerHTML + " amet"));
-    body.appendChild(createExample("Input (khmer)", "input", "ជាណាចក្រកម្ពុជា " + createPill("ព្រះរា").outerHTML + " កម្ពុជា"));
-    body.appendChild(createExample("Input (chinese)", "input", "滆, 駇僾 踆 耜僇鄗 鏀顝饇 芘芛芤 岪弨 蔏 儮嬼懫 " + createPill("厊圪妀").outerHTML + " 鴸鼢曘"));
-    body.appendChild(createExample("Input (hebrew)", "input rtl", "את אל בקרבת יוצרים בהיסטוריה " + createPill("היסטוריה").outerHTML + " ב צ'ט בחירות מיתולוגיה"));
+    body.appendChild(new Example("Input (resizable)", "input resize", "Lorem ipsum " + new Pill("dolor sit").source.outerHTML + " amet").source);
+    body.appendChild(new Example("Input (autoexpand)", "input autoexpand", "Lorem ipsum " + new Pill("dolor sit").source.outerHTML + " amet").source);
+    body.appendChild(new Example("Input (khmer)", "input", "ជាណាចក្រកម្ពុជា " + new Pill("ព្រះរា").source.outerHTML + " កម្ពុជា").source);
+    body.appendChild(new Example("Input (chinese)", "input", "滆, 駇僾 踆 耜僇鄗 鏀顝饇 芘芛芤 岪弨 蔏 儮嬼懫 " + new Pill("厊圪妀").source.outerHTML + " 鴸鼢曘").source);
+    body.appendChild(new Example("Input (hebrew)", "input rtl", "את אל בקרבת יוצרים בהיסטוריה " + new Pill("היסטוריה").source.outerHTML + " ב צ'ט בחירות מיתולוגיה").source);
     document.addEventListener("dragstart", dragStartHandler);
     document.addEventListener("dragend", dragEndHandler);
     document.addEventListener("dragenter", dragEnterHandler);
@@ -49,7 +47,7 @@
     document.addEventListener("contextmenu", clickHandler);
     document.addEventListener("click", clickHandler);
     document.addEventListener("mousedown", mouseDownHandler);
-    document.addEventListener("blur", blurHandler);
+    document.addEventListener("blur", blurHandler, true);
     document.addEventListener("copy", copyHandler);
     document.addEventListener("cut", cutHandler);
     document.addEventListener("paste", pasteHandler);
