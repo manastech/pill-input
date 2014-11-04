@@ -1,0 +1,16 @@
+{
+  "name": "pill-input-bower",
+  "version": "0.0.0",
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "*",
+    "grunt": "*",
+    "grunt-contrib-coffee": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-mocha-test": "*",
+    "grunt-sass": "^0.16.1",
+    "matchdep": "*",
+    "mocha": "*",
+    "sinon": "*"
+  }
+}

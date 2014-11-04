@@ -1,0 +1,22 @@
+{
+  "name": "pill-input-bower",
+  "description": "html based input with text and pills",
+  "main": [
+    "dist/pill-input.js",
+    "dist/pill-input.css"
+  ],
+  "ignore": [
+    "src",
+    "test",
+    ".gitignore",
+    ".editorconfig",
+    ".jshintrc",
+    "bower.json",
+    "Gruntfile.coffee",
+    "package.json"
+  ],
+  "version": "0.0.0",
+  "dependencies": {
+    "bowser": "~0.7.2"
+  }
+}
