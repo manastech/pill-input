@@ -3,56 +3,63 @@
 <head>
   <title>mBuilder</title>
   <link rel="stylesheet" type="text/css" href="../dist/pill-input.css">
+  <style type="text/css">
+    .pill {
+      border: 1px solid #ddd;
+      border-radius: 15px;
+      margin: 0px 5px;
+      padding: 0px 4px;
+      display: inline-block;
+    }
+  </style>
   <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-  <script type="text/javascript" src="../dist/pill-input.js"></script>
+  <script type="text/javascript" src="../bower_components/jquery/jquery.js"></script>
   <script type="text/javascript" src="../bower_components/bowser/bowser.js"></script>
+  <script type="text/javascript" src="../dist/pill-input.js"></script>
+  <meta charset="utf-8">
+  <script type="text/javascript">
+    $(function() {
+
+      $(".pillInput").each(function(i, elem){
+
+
+        var pillInput = new PillInput($(elem),
+          {
+            renderPill: function (pill, dom) {
+              dom.text(pill.legend)
+            }
+          }
+        );
+
+        pillInput.value($(elem).data('value'));
+
+        pillInput.on('pillinput:changed', function(){
+          $(elem).attr('data-value', JSON.stringify(pillInput.value()));
+        })
+
+      });
+    });
+  </script>
 </head>
-<meta charset="utf-8">
 <body>
-</body>
-<script>
+  <p>Input (resizable)</p>
+  <div class="pillInput input resize" data-value="[&quot;Lorem ipsum&quot;, {&quot;legend&quot;: &quot;dolor sit&quot;}, &quot;amet&quot;]">
+  </div>
 
-  function Example(title, className, content) {
-    var example = document.createElement("div");
-    example.className = "example";
-    var header = example.appendChild(document.createElement("h1"));
-    header.textContent = title;
-    var textInput = example.appendChild(document.createElement("div"));
-    textInput.className = className;
-    textInput.contentEditable = "true";
-    textInput.innerHTML = content;
-    var dropZone = example.appendChild(document.createElement("div"));
-    dropZone.className = "dropZone";
-    var button =  example.appendChild(document.createElement("button"));
-    button.className = "pillButton";
-    button.textContent = "Create pill";
-    button.style.display = "none";
-    this.source = example;
-  }
+  <p>Input (autoexpand)</p>
+  <div class="pillInput input autoexpand" data-value="[&quot;Lorem ipsum&quot;, {&quot;legend&quot;: &quot;dolor sit&quot;}, &quot;amet&quot;]">
+  </div>
+<!--
+  <p>Input (khmer)</p>
+  <div class="pillInput input" data-value="['ជាណាចក្រកម្ពុជា '' + {legen: 'ព្រះរា', ' កម្ពុជា']">
+  </div>
 
-  window.onload = function() {
-    var body = document.body;
-    body.appendChild(new Example("Input (resizable)", "input resize", "Lorem ipsum " + new Pill("dolor sit").source.outerHTML + " amet").source);
-    body.appendChild(new Example("Input (autoexpand)", "input autoexpand", "Lorem ipsum " + new Pill("dolor sit").source.outerHTML + " amet").source);
-    body.appendChild(new Example("Input (khmer)", "input", "ជាណាចក្រកម្ពុជា " + new Pill("ព្រះរា").source.outerHTML + " កម្ពុជា").source);
-    body.appendChild(new Example("Input (chinese)", "input", "滆, 駇僾 踆 耜僇鄗 鏀顝饇 芘芛芤 岪弨 蔏 儮嬼懫 " + new Pill("厊圪妀").source.outerHTML + " 鴸鼢曘").source);
-    body.appendChild(new Example("Input (hebrew)", "input rtl", "את אל בקרבת יוצרים בהיסטוריה " + new Pill("היסטוריה").source.outerHTML + " ב צ'ט בחירות מיתולוגיה").source);
-    document.addEventListener("dragstart", dragStartHandler);
-    document.addEventListener("dragend", dragEndHandler);
-    document.addEventListener("dragenter", dragEnterHandler);
-    document.addEventListener("dragleave", dragLeaveHandler);
-    document.addEventListener("dragover", dragOverHandler);
-    document.addEventListener("drop", dropHandler);
-    document.addEventListener("keydown", keyDownHandler);
-    document.addEventListener("keyup", keyUpHandler);
-    document.addEventListener("contextmenu", clickHandler);
-    document.addEventListener("click", clickHandler);
-    document.addEventListener("mousedown", mouseDownHandler);
-    document.addEventListener("blur", blurHandler, true);
-    document.addEventListener("copy", copyHandler);
-    document.addEventListener("cut", cutHandler);
-    document.addEventListener("paste", pasteHandler);
-  }
-
-</script>
+  <p>Input (chinese)</p>
+  <div class="pillInput input" data-value="['滆, 駇僾 踆 耜僇鄗 鏀顝饇 芘芛芤 岪弨 蔏 儮嬼懫 '' + {legen: '厊圪妀', ' 鴸鼢曘']">
+  </div>
+ -->
+<!--   <p>Input (hebrew)</p>
+  <div class="pillInput input rtl" data-value="['את אל בקרבת יוצרים בהיסטוריה '' + {legen: 'היסטוריה', ' ב צ'ט בחירות מיתולוגיה']">
+  </div>
+ --></body>
 </html>

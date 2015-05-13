@@ -8,7 +8,7 @@
     "grunt-contrib-coffee": "*",
     "grunt-contrib-uglify": "*",
     "grunt-mocha-test": "*",
-    "grunt-sass": "^0.16.1",
+    "grunt-sass": "^1.0.0",
     "matchdep": "*",
     "mocha": "*",
     "sinon": "*"

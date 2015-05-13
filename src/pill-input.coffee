@@ -13,6 +13,8 @@ PILL_BUTTON = "pillButton"
 
 DATA_OPTION = "data-option"
 MOVE = "move"
+LINK = "link"
+ALL = "all"
 TEXT = "text"
 
 DRAG_OVER = "dragover"
@@ -317,7 +319,7 @@ class PillInputController
       data = @documentFragmentToString(@dragElement)
 
     if data
-      e.originalEvent.dataTransfer.effectAllowed = MOVE
+      e.originalEvent.dataTransfer.effectAllowed = ALL
       e.originalEvent.dataTransfer.setData(TEXT, data)
       e.stopPropagation()
 
@@ -470,7 +472,7 @@ class PillInputController
     input = @getAncestor(INPUT, e.target)
     if input
       wrapper = document.createElement(DIV)
-      wrapper.innerHTML = e.originalEvent.clipboardData.getData(TEXT)
+      wrapper.innerHTML = e.originalEvent.clipboardData.getData(TEXT).replace(/\r?\n/g, ' ')
       elements = @toArray(wrapper.childNodes)
       @insert elements
       range = document.createRange()

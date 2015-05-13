@@ -1,5 +1,5 @@
 (function() {
-  var A, ARROW, BLUR, BR, BUTTON, CLICK, CONTEXT_MENU, COPY, CUT, DATA_OPTION, DIV, DRAG_OVER, DROP, FOCUS, INPUT, KEYDOWN, KEYUP, MENU, MOUSE_DOWN, MOUSE_MOVE, MOUSE_UP, MOVE, OPTION, PILL, PILL_BUTTON, PillInput, PillInputController, SPAN, TEXT, root,
+  var A, ALL, ARROW, BLUR, BR, BUTTON, CLICK, CONTEXT_MENU, COPY, CUT, DATA_OPTION, DIV, DRAG_OVER, DROP, FOCUS, INPUT, KEYDOWN, KEYUP, LINK, MENU, MOUSE_DOWN, MOUSE_MOVE, MOUSE_UP, MOVE, OPTION, PILL, PILL_BUTTON, PillInput, PillInputController, SPAN, TEXT, root,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   BUTTON = "button";
@@ -27,6 +27,10 @@
   DATA_OPTION = "data-option";
 
   MOVE = "move";
+
+  LINK = "link";
+
+  ALL = "all";
 
   TEXT = "text";
 
@@ -441,7 +445,7 @@
         data = this.documentFragmentToString(this.dragElement);
       }
       if (data) {
-        e.originalEvent.dataTransfer.effectAllowed = MOVE;
+        e.originalEvent.dataTransfer.effectAllowed = ALL;
         e.originalEvent.dataTransfer.setData(TEXT, data);
         return e.stopPropagation();
       }
@@ -619,7 +623,7 @@
       input = this.getAncestor(INPUT, e.target);
       if (input) {
         wrapper = document.createElement(DIV);
-        wrapper.innerHTML = e.originalEvent.clipboardData.getData(TEXT);
+        wrapper.innerHTML = e.originalEvent.clipboardData.getData(TEXT).replace(/\r?\n/g, ' ');
         elements = this.toArray(wrapper.childNodes);
         this.insert(elements);
         range = document.createRange();
