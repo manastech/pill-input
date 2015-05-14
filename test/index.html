@@ -25,7 +25,10 @@
         var pillInput = new PillInput($(elem),
           {
             renderPill: function (pill, dom) {
-              dom.text(pill.legend)
+              dom.text(pill.legend);
+              if (pill.arrow) {
+                dom.append($("<span>").addClass("arrow"));
+              }
             }
           }
         );
@@ -41,8 +44,12 @@
   </script>
 </head>
 <body>
+  <p>Input</p>
+  <div class="pillInput" style="width: 300px;" data-value="[&quot;Lorem ipsum&quot;, {&quot;legend&quot;: &quot;dolor sit&quot;}, {&quot;legend&quot;: &quot;dolor sit&quot;, &quot;arrow&quot;: &quot;true&quot;}, &quot;amet&quot;]">
+  </div>
+
   <p>Input (resizable)</p>
-  <div class="pillInput resize" data-value="[&quot;Lorem ipsum&quot;, {&quot;legend&quot;: &quot;dolor sit&quot;}, &quot;amet&quot;]">
+  <div class="pillInput resize" style="width: 300px;" data-value="[&quot;Lorem ipsum&quot;, {&quot;legend&quot;: &quot;dolor sit&quot;}, &quot;amet&quot;]">
   </div>
 
   <p>Input (autoexpand)</p>

@@ -40,4 +40,14 @@
     }
   }
 
+  &.resize {
+    min-height: 100px;
+    resize: both;
+  }
+
+  &.autoexpand {
+    overflow-x: auto;
+    overflow-y: visible;
+    height: auto;
+  }
 }

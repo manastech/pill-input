@@ -26,5 +26,12 @@
     outline: none; }
     .pillInput:focus .pill.focus .arrow {
       border-color: #1E86C8 transparent transparent transparent; }
+  .pillInput.resize {
+    min-height: 100px;
+    resize: both; }
+  .pillInput.autoexpand {
+    overflow-x: auto;
+    overflow-y: visible;
+    height: auto; }
 
 /*# sourceMappingURL=pill-input.css.map */
