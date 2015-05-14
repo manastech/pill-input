@@ -8,8 +8,6 @@
   background: white;
   line-height: 26px;
   cursor: text; }
-  .pillInput:empty {
-    background: #EEEEEE !important; }
   .pillInput .pill .arrow {
     margin: 0px 0px 1px 5px;
     cursor: pointer;
