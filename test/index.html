@@ -22,7 +22,6 @@
 
       $(".pillInput").each(function(i, elem){
 
-
         var pillInput = new PillInput($(elem),
           {
             renderPill: function (pill, dom) {
@@ -43,23 +42,24 @@
 </head>
 <body>
   <p>Input (resizable)</p>
-  <div class="pillInput input resize" data-value="[&quot;Lorem ipsum&quot;, {&quot;legend&quot;: &quot;dolor sit&quot;}, &quot;amet&quot;]">
+  <div class="pillInput resize" data-value="[&quot;Lorem ipsum&quot;, {&quot;legend&quot;: &quot;dolor sit&quot;}, &quot;amet&quot;]">
   </div>
 
   <p>Input (autoexpand)</p>
-  <div class="pillInput input autoexpand" data-value="[&quot;Lorem ipsum&quot;, {&quot;legend&quot;: &quot;dolor sit&quot;}, &quot;amet&quot;]">
+  <div class="pillInput autoexpand" data-value="[&quot;Lorem ipsum&quot;, {&quot;legend&quot;: &quot;dolor sit&quot;}, &quot;amet&quot;]">
   </div>
-<!--
+
   <p>Input (khmer)</p>
-  <div class="pillInput input" data-value="['ជាណាចក្រកម្ពុជា '' + {legen: 'ព្រះរា', ' កម្ពុជា']">
+  <div class="pillInput" data-value="[&quot;ជាណាចក្រកម្ពុជា&quot;, {&quot;legend&quot;: &quot;ព្រះរា&quot;}, &quot;កម្ពុជា&quot;]">
   </div>
 
   <p>Input (chinese)</p>
-  <div class="pillInput input" data-value="['滆, 駇僾 踆 耜僇鄗 鏀顝饇 芘芛芤 岪弨 蔏 儮嬼懫 '' + {legen: '厊圪妀', ' 鴸鼢曘']">
+  <div class="pillInput" data-value="[&quot;滆, 駇僾 踆 耜僇鄗 鏀顝饇 芘芛芤 岪弨 蔏 儮嬼懫&quot;, {&quot;legend&quot;: &quot;厊圪妀&quot;}, &quot;鴸鼢曘&quot;]">
   </div>
- -->
-<!--   <p>Input (hebrew)</p>
-  <div class="pillInput input rtl" data-value="['את אל בקרבת יוצרים בהיסטוריה '' + {legen: 'היסטוריה', ' ב צ'ט בחירות מיתולוגיה']">
+
+  <p>Input (hebrew)</p>
+  <div class="pillInput rtl" data-value="[&quot;את אל בקרבת יוצרים בהיסטוריה &quot;, {&quot;legend&quot;: &quot;היסטוריה&quot;}, &quot; ב צ'ט בחירות מיתולוגיה&quot;]">
   </div>
- --></body>
+
+</body>
 </html>
