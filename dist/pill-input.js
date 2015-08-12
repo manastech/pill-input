@@ -286,7 +286,7 @@
       if (element.hasChildNodes() && element.firstChild.nodeName === BR) {
         element.removeChild(element.firstChild);
       }
-      $('span', $(element)).contents().unwrap();
+      $('span:not([class])', $(element)).contents().unwrap();
       return $('*', $(element)).removeAttr('style');
     };
 
